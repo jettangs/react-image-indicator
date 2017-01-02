@@ -31,7 +31,7 @@ class App extends React.Component {
         ))
         return (
             <div className="menu">
-                {   
+                {      
                     this.state.index != -1 && 
                     <Indicator
                         className="indicator"
