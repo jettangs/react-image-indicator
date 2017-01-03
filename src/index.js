@@ -3,31 +3,22 @@ import {css, creatStyle} from 'aphrodite-freestyle'
 
 let style = {
     base: {
-        indicator:{ position: 'fixed', visibility: 'hidden',
-            '*img': {
-
-            }
-        }
+        indicator:{ position: 'fixed', visibility: 'hidden'}
     }
 }
-/**
- * 判断图片是否加载完整
- */
+
 const SImage = (src,callback) => {
     var img = new Image();
     img.src = src;
     var appname = navigator.appName.toLowerCase();
-    
-    if (appname.indexOf("netscape") == -1) {
-       //ie
+    if (appname.indexOf("netscape") == -1) { //ie
         img.onreadystatechange = function () {
             if (img.readyState == "complete") {
                 callback(img);
             }
         };
     } else {
-       //firefox
-        img.onload = function () {
+        img.onload = function () { //firefox
             if (img.complete == true) {
                 callback(img);
             }
@@ -49,7 +40,7 @@ const getLeft = e => {
 
 export default class Indicator extends React.Component{
 
-    state = {style: creatStyle(style)}
+    state = {style: creatStyle(style),imageLoaded:false}
 
     componentDidMount() {
         
@@ -63,32 +54,39 @@ export default class Indicator extends React.Component{
             let width = image.width
             let height = image.height
             let limit = this.props.limit
+            let _image = style.base.indicator['*img'] = {}
+            _image.width = width+'px'
+            _image.height = height+'px'
             if(limit) {
                 if(limit.width && !limit.height) {
                     if(width > limit.width) {
                         width = limit.width
                         height = width*(image.height/image.width)
-                        style.base.indicator['*img'].width = limit.width+'px'
+                        _image.width = limit.width+'px'
+                        _image.height = height+'px'
                     }
                 }else if(limit.height && !limit.width) {
                     if(height > limit.height) {
                         height = limit.height
                         width = height*(image.width/image.height)
-                        style.base.indicator['*img'].height = limit.height+'px'
+                        _image.height = limit.height+'px'
+                        _image.width = width+'px'
                     }
                 }else {
                     width = limit.width
                     height = limit.height
-                    style.base.indicator['*img'].height = height+'px'
-                    style.base.indicator['*img'].width = width+'px'
+                    _image.height = height+'px'
+                    _image.width = width+'px'
                 }
             }
 
             let pLeft = getLeft(props.parent)
             let pTop = getTop(props.parent)
+
             if(!props.offset) {
                 props.offset = {x:0, y:0}
             }
+            
             switch (props.direction) {
                 case 'left':
                     self.left = pLeft - width + props.offset.x
@@ -108,16 +106,16 @@ export default class Indicator extends React.Component{
                     break
             }
             self.visibility = 'visible'
-            this.setState({style:creatStyle(style)})
+
+            this.setState({style:creatStyle(style),imageLoaded:true})
         })
     }
 
     render() {
         let _style = this.state.style
-
         return (
             <div className={this.props.className + ' ' + css(_style.indicator)}>
-                {this.props.children}
+                {this.state.imageLoaded && <img src={this.props.images[this.props.index]}/>}
             </div>
         )
     }
