@@ -36,12 +36,13 @@ class App extends React.Component {
         return (
             <div className="menu">
                 {   
-                    this.state.index != -1 && 
                     <Indicator
+                        className="indicator"
                         direction="top"
                         images={this.images}
                         index={this.state.index}
-                        offset={{x:0, y:-20}}
+                        limit={{height:'60',width:'60'}}
+                        offset={{x:0, y:-30}}
                         parent={document.getElementsByClassName('menu')[0]}
                         anchor={document.getElementsByClassName('item')[this.state.index]}
                     >
@@ -62,21 +63,24 @@ render(<App/>, document.getElementById('app'))
 ### API
 ```javascript
 /**
- * @param {string} direction: 'top', 'left', 'right' or 'bottom'.
- * @param {array} images: an array of paths of images.
- * @param {number} index: which images to display.
- * @param {object} parent: the indicator's parent.
- * @param {object} anchor: the position reference to display.
+ * @param @required {string} direction: 'top', 'left', 'right' or 'bottom'.
+ * @param @required {array} images: an array of paths of images.
+ * @param @required {number} index: which images to display.
+ * @param {object} limit: limit the image size.
+ * @param @required {object} parent: the indicator's parent.
+ * @param @required {object} anchor: the position reference to display.
  * @param {object} offset: the offset value to adjust the position.
  */
 
 <Indicator
+    className="indicator"
     direction="top"
     images={this.images}
     index={this.state.index}
-    offset={{x:0, y:-20}}
+    offset={{x:0, y:-30}}
+    limit={{height:'60',width:'60'}}
     parent={document.getElementsByClassName('menu')[0]}
     anchor={document.getElementsByClassName('item')[this.state.index]}
-/>
+>
 ```
 

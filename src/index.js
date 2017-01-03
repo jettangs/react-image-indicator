@@ -3,7 +3,11 @@ import {css, creatStyle} from 'aphrodite-freestyle'
 
 let style = {
     base: {
-        indicator:{ position: 'fixed', visibility: 'hidden'}
+        indicator:{ position: 'fixed', visibility: 'hidden',
+            '*img': {
+
+            }
+        }
     }
 }
 /**
@@ -31,34 +35,76 @@ const SImage = (src,callback) => {
     }
 }
 
+const getTop = e => { 
+    var offset = e.offsetTop; 
+    if(e.offsetParent!=null) offset+=getTop(e.offsetParent)
+    return offset
+} 
+
+const getLeft = e => { 
+    var offset = e.offsetLeft
+    if(e.offsetParent!=null) offset+=getLeft(e.offsetParent)
+    return offset
+} 
+
 export default class Indicator extends React.Component{
 
     state = {style: creatStyle(style)}
 
     componentDidMount() {
+        
         let props = this.props
         let src = props.images[props.index]
-        
+
         SImage(src, image => {
             let self = style.base.indicator
-            let x = props.anchor.offsetLeft + props.anchor.offsetWidth * 0.5
-            let y = props.anchor.offsetTop + props.anchor.offsetHeight * 0.5
+            let x = getLeft(props.anchor) + props.anchor.offsetWidth * 0.5
+            let y = getTop(props.anchor) + props.anchor.offsetHeight * 0.5
+            let width = image.width
+            let height = image.height
+            let limit = this.props.limit
+            if(limit) {
+                if(limit.width && !limit.height) {
+                    if(width > limit.width) {
+                        width = limit.width
+                        height = width*(image.height/image.width)
+                        style.base.indicator['*img'].width = limit.width+'px'
+                    }
+                }else if(limit.height && !limit.width) {
+                    if(height > limit.height) {
+                        height = limit.height
+                        width = height*(image.width/image.height)
+                        style.base.indicator['*img'].height = limit.height+'px'
+                    }
+                }else {
+                    width = limit.width
+                    height = limit.height
+                    style.base.indicator['*img'].height = height+'px'
+                    style.base.indicator['*img'].width = width+'px'
+                }
+            }
+
+            let pLeft = getLeft(props.parent)
+            let pTop = getTop(props.parent)
+            if(!props.offset) {
+                props.offset = {x:0, y:0}
+            }
             switch (props.direction) {
                 case 'left':
-                    self.left = props.parent.offsetLeft - image.width + props.offset.x
-                    self.top = y - image.height * 0.5 + props.offset.y
+                    self.left = pLeft - width + props.offset.x
+                    self.top = y - height * 0.5 + props.offset.y
                     break
                 case 'right':
-                    self.left = props.parent.offsetLeft + props.parent.offsetWidth + props.offset.x
-                    self.top = y - image.height * 0.5 + props.offset.y
+                    self.left = pLeft + props.parent.offsetWidth + props.offset.x
+                    self.top = y - height * 0.5 + props.offset.y
                     break
                 case 'top':
-                    self.left = x - image.width * 0.5 + props.offset.x
-                    self.top = props.parent.offsetTop - image.height + props.offset.y
+                    self.left = x - width * 0.5 + props.offset.x
+                    self.top = pTop - height + props.offset.y
                     break
                 case 'bottom':
-                    self.left = x - image.width * 0.5 + props.offset.x
-                    self.top = props.parent.offsetTop + props.parent.offsetHeight + props.offset.y
+                    self.left = x - width * 0.5 + props.offset.x
+                    self.top = pTop + props.parent.offsetHeight + props.offset.y
                     break
             }
             self.visibility = 'visible'
@@ -68,8 +114,9 @@ export default class Indicator extends React.Component{
 
     render() {
         let _style = this.state.style
+
         return (
-            <div className={this.props.className+' '+css(_style.indicator)}>
+            <div className={this.props.className + ' ' + css(_style.indicator)}>
                 {this.props.children}
             </div>
         )

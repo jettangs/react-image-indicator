@@ -38,6 +38,7 @@ class App extends React.Component {
                         direction="top"
                         images={this.images}
                         index={this.state.index}
+                        limit={{height:'60',width:'60'}}
                         offset={{x:0, y:-30}}
                         parent={document.getElementsByClassName('menu')[0]}
                         anchor={document.getElementsByClassName('item')[this.state.index]}
